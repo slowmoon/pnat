@@ -48,7 +48,7 @@ func NewPNAT(host string, port string)*PNatManager {
         Host: host,
         Port: port,
         SubNets: make(map[string]*Worker),
-        closed: make(chan struct{}),
+        closed: make(chan struct{}, 1),
         WorkerPort: PORT_LEASE,
     }
 
@@ -96,18 +96,18 @@ func (p *PNatManager)FetchNetworks() {
 
 func (p *PNatManager)handleFetch(msg []byte) {
 
-    var networkId  string
+    var networkId  string = "testnet"
 
     if  wk, ok := p.SubNets[networkId];!ok {
 
-        worker, err := NewWorker(p, "", "")
+        worker, err := NewWorker(p, "10.72.12.22", "14112")
 
         if err!=nil{
             log.Printf("create worker fail error %s\n",err.Error())
         }
         go worker.Start()
 
-        p.SubNets["networkId"] = worker
+        p.SubNets[networkId] = worker
     }else {
         wk.Create = time.Now()
     }
@@ -139,5 +139,15 @@ func (p *PNatManager)healthyChecks() {
        }
    }
    p.SubNets = subnets
+}
+
+func (p *PNatManager)Close() {
+    p.mutex.Lock()
+    defer p.mutex.Unlock()
+    for k, v := range p.SubNets {
+    	v.Stop()
+    	delete(p.SubNets, k)
+    }
+    p.closed  <- struct{}{}
 
 }

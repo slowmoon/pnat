@@ -22,7 +22,7 @@ func main()  {
    flag.Parse()
 
    natserver := server.NewPNAT(host, port)
-   ticker := time.NewTicker(time.Minute * 5)
+   ticker := time.NewTicker(time.Second * 5)
 
    ch := make(chan os.Signal, 1)
    signal.Notify(ch, syscall.SIGINT,  syscall.SIGHUP)
@@ -32,6 +32,7 @@ func main()  {
       case <-ticker.C:
          natserver.FetchNetworks()
       case  <- ch:
+         natserver.Close()
          return
       }
    }
