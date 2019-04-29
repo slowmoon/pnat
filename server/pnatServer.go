@@ -1,6 +1,7 @@
 package server
 
 import (
+    "fmt"
     "log"
     "net"
     "sync"
@@ -52,6 +53,7 @@ func NewPNAT(host string, port string)*PNatManager {
     }
 
     remoteAddr,err := net.ResolveUDPAddr("udp", net.JoinHostPort(manager.Host, manager.Port))
+
     if err!=nil{
        panic("init pnat manager error")
     }
@@ -62,6 +64,7 @@ func NewPNAT(host string, port string)*PNatManager {
        panic("dial udp server error!")
    }
    manager.Conn = conn
+   log.Printf("manager start ok @ host %s port %s\n", host, port)
    return  &manager
 }
 
@@ -74,6 +77,7 @@ func (p *PNatManager)RandPort()int {
 }
 
 func (p *PNatManager)FetchNetworks() {
+	fmt.Println("fetch networks begin:")
    if conn, ok := p.Conn.(*net.UDPConn);ok{
       _, err := conn.Write(request)
       if err!= nil{

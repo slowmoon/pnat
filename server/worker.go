@@ -58,6 +58,8 @@ func NewWorker(manager *PNatManager, host string, port string)(worker *Worker, e
 		return  nil, err
 	}
 	worker.conn = conn
+
+	log.Println("worker start success")
 	return
 }
 

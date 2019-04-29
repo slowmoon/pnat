@@ -25,15 +25,14 @@ func main()  {
    ticker := time.NewTicker(time.Minute * 5)
 
    ch := make(chan os.Signal, 1)
-   signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
-
+   signal.Notify(ch, syscall.SIGINT,  syscall.SIGHUP)
 
    for {
       select {
       case <-ticker.C:
          natserver.FetchNetworks()
-      case <-ch:
-      	break
+      case  <- ch:
+         return
       }
    }
 
